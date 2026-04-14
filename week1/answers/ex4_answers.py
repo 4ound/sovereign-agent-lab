@@ -7,30 +7,45 @@ Fill this in after running exercise4_mcp_client.py.
 # ── Basic results ──────────────────────────────────────────────────────────
 
 # Tool names as shown in "Discovered N tools" output.
-TOOLS_DISCOVERED = []
+TOOLS_DISCOVERED = ["search_venues", "get_venue_details"]
 
-QUERY_1_VENUE_NAME    = "FILL_ME_IN"
-QUERY_1_VENUE_ADDRESS = "FILL_ME_IN"
-QUERY_2_FINAL_ANSWER  = "FILL_ME_IN"
+QUERY_1_VENUE_NAME    = "The Haymarket Vaults"
+QUERY_1_VENUE_ADDRESS = "1 Dalry Road, Edinburgh"
+QUERY_2_FINAL_ANSWER  = """
+It seems there are no Edinburgh venues currently available that can accommodate 300 people with vegan options. Would you like to:
+
+1. Search for venues with a lower capacity?
+2. Look for venues without vegan requirements?
+3. Check availability for a different date?
+
+Let me know how you'd like to proceed.
+"""
 
 # ── The experiment ─────────────────────────────────────────────────────────
 # Required: modify venue_server.py, rerun, revert.
 
-EX4_EXPERIMENT_DONE = None   # True or False
+EX4_EXPERIMENT_DONE = True   # True or False
 
 # What changed, and which files did or didn't need updating? Min 30 words.
 EX4_EXPERIMENT_RESULT = """
-FILL ME IN
+I was required to update the only one line in sovereign_agent/tools/mcp_venue_server.py (The Albanach venue status 
+from "available" to "full").
+The final output wasn't changed, however in intermediate calls for q1 I observed, that tool_result output was
+different (2 and 1 matches respectively). Thus thinking flow was slightly changed (no need to choose if only 1 option
+is available).
 """
 
 # ── MCP vs hardcoded ───────────────────────────────────────────────────────
 
-LINES_OF_TOOL_CODE_EX2 = 0   # count in exercise2_langgraph.py
+LINES_OF_TOOL_CODE_EX2 = 8   # count in exercise2_langgraph.py
 LINES_OF_TOOL_CODE_EX4 = 0   # count in exercise4_mcp_client.py
 
 # What does MCP buy you beyond "the tools are in a separate file"? Min 30 words.
 MCP_VALUE_PROPOSITION = """
-FILL ME IN
+In MCP tools are being retrieved dynamically, so if new tool is added or remove, existing code don't require any manual
+updates. In opposite, in hardcoded approach, if we want to add new tool, we need to update code manually 
+(add new function and update tool list).
+Moreover, MCP is universal protocol, that can be easily plugged to other agents.
 """
 
 # ── PyNanoClaw architecture — SPECULATION QUESTION ─────────────────────────
@@ -70,11 +85,13 @@ FILL ME IN
 #     ambiguous task.
 
 WEEK_5_ARCHITECTURE = """
-- FILL ME IN
-- FILL ME IN
-- FILL ME IN
-- FILL ME IN
-- FILL ME IN
+- Planner (upstream layer): Strong-reasoning model that orchestrates whole flow of the task and breaks it to subgoals.
+- Executor (autonomous loop layer): ReAct loop with list of tools, to make research and select venues, 
+that satisfy initial request. After venue is booked, generation of flyers and sending invitations.
+- Memory store (shared layer): Storage, responsible for keeping conversation history, states, tools call history, etc.
+- Handoff bridge (shared layer): Pass information from part1 (LangGraph) to part2 (Rasa) to make a reservation.
+Connection may be bidirectional, in case reservation failed, so we can try with other options.
+- Rasa (structured agent layer): Making a call to venue and reports the success/failure/other. 
 """
 
 # ── The guiding question ───────────────────────────────────────────────────
@@ -82,5 +99,11 @@ WEEK_5_ARCHITECTURE = """
 # Must reference specific things you observed in your runs. Min 60 words.
 
 GUIDING_QUESTION_ANSWER = """
-FILL ME IN
+LangGraph agent plays role of the research, calling tools for gathering additional information to satisfy our request.
+The Rasa agent is responsible for handling human friendly/human-style dialog or conversation with real people,
+that will perfectly work for interacting via chat or phone (with additional s2t and t2s setups).
+Swapping will feel wrong, because Rasa is deterministic, with defined flow, that works perfect to complete scripted
+task, but it's not suitable for research.
+LangGraph doesn't have defined flow (more ways for improvisation), interaction should be given in one prompt,
+that wouldn't work for interactions via phone.
 """
